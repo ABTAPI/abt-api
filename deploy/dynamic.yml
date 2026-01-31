@@ -1,0 +1,25 @@
+
+# traefik/dynamic.yml
+http:
+  middlewares:
+    secureHeaders:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+  routers:
+    abt-api:
+      rule: Host(`api.example.com`) && PathPrefix(`/v1`)
+      entryPoints: [websecure]
+      service: abt-api-svc
+      tls:
+        certResolver: letsencrypt
+        clientAuth:
+          caFiles:
+            - /certs/clients/ca.crt
+          clientAuthType: RequireAndVerifyClientCert
+  services:
+    abt-api-svc:
+      loadBalancer:
+        servers:
+          - url: http://api:8000

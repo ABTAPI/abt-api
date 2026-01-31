@@ -1,0 +1,18 @@
+
+# traefik/traefik.yml
+entryPoints:
+  websecure:
+    address: ":443"
+serversTransport:
+  maxIdleConnsPerHost: 64
+api:
+  dashboard: true
+providers:
+  docker:
+    exposedByDefault: false
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ops@example.com
+      storage: /letsencrypt/acme.json
+      tlsChallenge: {}
