@@ -1,0 +1,101 @@
+{
+  "info": {
+    "name": "ABT Risk Scoring API",
+    "_postman_id": "f1c7a9f8-5e5e-4a2a-9a1f-ps-abt",
+    "description": "Collection for ABT API (JWT-protected). Set {{host}} and tokens in variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Healthz",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://{{host}}/healthz",
+          "host": [
+            "{{host}}"
+          ],
+          "protocol": "https",
+          "path": [
+            "healthz"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Rubric (read:rubric)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_read}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "https://{{host}}/v1/rubric",
+          "host": [
+            "{{host}}"
+          ],
+          "protocol": "https",
+          "path": [
+            "v1",
+            "rubric"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Score (score:write)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_write}}",
+            "type": "text"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "postman-{{$timestamp}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"case_id\": \"demo-001\",\n  \"inputs\": {\n    \"ATR\": {\"able_to_get_help\": \"no representation; blocked access\"},\n    \"POC\": {\"impact\": \"financial burden and emotional harm\"},\n    \"TRI\": {\"docs\": \"missing documents and secrecy\"},\n    \"ITR\": {\"appeal\": \"unavailable review with bias\"}\n  }\n}"
+        },
+        "url": {
+          "raw": "https://{{host}}/v1/score-abt",
+          "host": [
+            "{{host}}"
+          ],
+          "protocol": "https",
+          "path": [
+            "v1",
+            "score-abt"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": "api.yourdomain.com"
+    },
+    {
+      "key": "token_read",
+      "value": "<JWT_WITH_read:rubric>"
+    },
+    {
+      "key": "token_write",
+      "value": "<JWT_WITH_score:write>"
+    }
+  ]
+}

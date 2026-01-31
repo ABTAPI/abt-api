@@ -1,0 +1,59 @@
+
+version: "3.9"
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: abt
+      POSTGRES_PASSWORD: abt
+      POSTGRES_DB: abt
+    ports: ["5432:5432"]
+    volumes:
+      - abtpg:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: /mnt/data
+      dockerfile: Dockerfile.abt.secure
+    env_file:
+      - .env.abt
+    environment:
+      - ABT_DB_URL=postgresql+psycopg2://abt:abt@db:5432/abt
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      # CHANGE THE HOST BELOW TO YOUR DOMAIN, e.g., api.yourdomain.com
+      - "traefik.http.routers.abt-api.rule=Host(`api.example.com`) && PathPrefix(`/v1`)"
+      - "traefik.http.routers.abt-api.entrypoints=websecure"
+      - "traefik.http.routers.abt-api.tls=true"
+      - "traefik.http.routers.abt-api.tls.certresolver=letsencrypt"
+      # Client auth relaxed (optional mTLS)
+      - "traefik.http.routers.abt-api.tls.clientauth.cafiles=/certs/clients/ca.crt"
+      - "traefik.http.routers.abt-api.tls.clientauth.clientauthtype=VerifyClientCertIfGiven"
+      # Map service to container port
+      - "traefik.http.services.abt-api.loadbalancer.server.port=8000"
+    expose: ["8000"]
+
+  traefik:
+    image: traefik:v3.0
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=ops@example.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--api.dashboard=true"
+    ports:
+      - "443:443"
+      - "8080:8080" # dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+      - client_ca:/certs/clients:ro
+
+volumes:
+  abtpg:
+  traefik_letsencrypt:
+  client_ca:
