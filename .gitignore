@@ -1,0 +1,23 @@
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.env
+.env.*
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker / Traefik
+deploy/letsencrypt/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
