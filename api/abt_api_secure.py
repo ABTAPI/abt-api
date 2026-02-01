@@ -3,7 +3,7 @@ import os, json, time, hashlib
 from datetime import datetime
 from typing import Dict, List, Optional
 
-import requests
+from fastapi import Request
 from fastapi import FastAPI, Depends, HTTPException, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -227,7 +227,10 @@ def healthz():
 
 @app.get(f"/{API_VERSION}/rubric")
 @limiter.limit(DEFAULT_RATE)
-async def get_rubric(auth=Depends(require_auth(["read:rubric"]))):
+async def get_rubric(
+    request: Request,
+    auth=Depends(require_auth(["read:rubric"]))
+):
     return {"rubric_version": RUBRIC_VERSION, "scoring_reference": ["ATR","POC","TRI","ITR"]}
 
 @app.post(f"/{API_VERSION}/score-abt", response_model=ScoreResponse)
@@ -288,6 +291,14 @@ async def submit_batch(request: Request, items: List[ScoreRequest], auth=Depends
 
 @app.get(f"/{API_VERSION}/cases/{{case_id}}")
 @limiter.limit(DEFAULT_RATE)
-async def get_case(case_id: str, auth=Depends(require_auth(["cases:read"]))):
+async def get_case(
+    request: Request,
+    case_id: str,
+    auth=Depends(require_auth(["cases:read"]))
+):
     # MVP: no persistence of cases beyond audit; extend in v1.2+
-    raise HTTPException(404, "MVP does not persist cases; enable DB-backed cases in v1.2+")
+    raise HTTPException(
+        status_code=404,
+        detail="MVP does not persist cases; enable DB-backed cases in v1.2+"
+    )
+

@@ -21,3 +21,4 @@ deploy/letsencrypt/
 # OS
 .DS_Store
 Thumbs.db
+new-filename.pub
