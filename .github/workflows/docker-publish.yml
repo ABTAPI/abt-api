@@ -47,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: /mnt/data/Dockerfile.abt.secure
+          file: api/Dockerfile
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
